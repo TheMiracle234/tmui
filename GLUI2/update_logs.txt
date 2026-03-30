@@ -1,0 +1,18 @@
+2026/3/21:
+	修复Component析构时parent的空孩子问题
+	贯彻RAII(解决Shader 析构与 gl终止不一致问题)
+	去除defaultShader.h
+	改变Viewport方式不再为限制型
+	去除lastShader static变量	
+
+2026/3/22:
+	window添加lastShader成员
+	新增Button组件
+
+2026/3/26：
+	完善Shader的文本渲染
+		vao, vbo, uniform location的静态化
+		y坐标的居中
+		文本的宽度获取
+	此后，放弃对 “具有全局属性的、仅构造时申请内存” 的对象的 “运行时” 资源回收，因为这是完全安全的
+	

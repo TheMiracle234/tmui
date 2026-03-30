@@ -1,0 +1,89 @@
+#pragma once
+
+#include "component/Event.h"
+#include "component/Text.h"
+#include "render/Shader.h"
+#include "debug/macros.h"
+#include <cstdint>
+#include <memory>
+
+namespace TM{
+
+	constexpr int DEFAULT_WIDTH = 0;
+
+	class Button: TM_public Text
+	{
+	TM_public:
+		enum class State : uint8_t {
+			ON,
+			DOWN,
+			NONE,
+		};
+
+		enum class Layer : uint8_t {
+			BACK,	//back
+			FRONT,	//texts
+		};
+
+		State state = State::NONE;
+	TM_private:	
+		bool ok = false;
+		glm::vec4 bkColors[2]; // ON and DOWN (NONE is from Rectangle)
+		glm::vec4 ftColors[3]; 
+		State lastState = State::NONE;
+
+		using Rect = Rectangle;
+
+	TM_private:
+		void renewFrontColor(glm::vec4 color) { txtColor = color; }
+
+		bool mouseOn() {
+			auto pos = Event::mouseMsg.getPos();
+			return 
+				pos.x >= position.x && pos.x <= position.x + width &&
+				pos.y >= position.y && pos.y <= position.y + height;
+		}
+
+		bool mouseDown() {
+			if ((lastState == State::ON || lastState == State::DOWN) && (Event::mouseMsg.action == Action::PRESS || Event::mouseMsg.action == Action::REPEAT))
+				return true;
+			return false;
+		}
+
+	TM_public:
+		Button(Window& window, int x, int y, int w, int h, std::string_view _u8str, std::string_view fontPath = "fonts/msyh.ttc", 
+			uint32_t colorBtNone = 0x22FF44AA, uint32_t colorBtOn = 0xFFFFFFFF, uint32_t colorBtDown = 0xFF0000FF,
+			uint32_t colorFtNone = 0x000000FF, uint32_t colorFtOn = 0x99999999, uint32_t colorFtDown = 0x666666FF
+		);
+		virtual ~Button();
+
+		void setColorOf(glm::vec4 color, State st, Layer layer) { colorOf(st, layer) = color; }
+
+		glm::vec4& colorOf(State st, Layer layer) {
+			switch (layer) {
+			case Layer::BACK:
+				switch (st) {
+				case State::NONE:	return rectColor;
+				default:			return bkColors[static_cast<uint8_t>(st)];
+				}
+				break;
+			case Layer::FRONT:
+				return ftColors[static_cast<uint8_t>(st)];
+			}
+			return rectColor;
+		}
+
+		State getState() { return state; }
+		//bool pressed() { return state == State::ON && lastState == State::DOWN; }
+		bool pressed() { return state == State::ON && lastState == State::DOWN; }
+
+	// static
+	TM_public:
+		static std::shared_ptr<Shader> btnDefaultShader(bool destruct = false);
+
+	// override 
+	TM_public:
+		void update() override;
+	};
+
+}
