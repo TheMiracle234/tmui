@@ -39,9 +39,10 @@ namespace TM{
 
 		bool mouseOn() {
 			auto pos = Event::mouseMsg.getPos();
+			auto realPos = getAbsPos();
 			return 
-				pos.x >= position.x && pos.x <= position.x + width &&
-				pos.y >= position.y && pos.y <= position.y + height;
+				pos.x >= realPos.x && pos.x <= realPos.x + width &&
+				pos.y >= realPos.y && pos.y <= realPos.y + height;
 		}
 
 		bool mouseDown() {
@@ -52,8 +53,8 @@ namespace TM{
 
 	TM_public:
 		Button(Window& window, int x, int y, int w, int h, std::string_view _u8str, std::string_view fontPath = "fonts/msyh.ttc", 
-			uint32_t colorBtNone = 0x22FF44AA, uint32_t colorBtOn = 0xFFFFFFFF, uint32_t colorBtDown = 0xFF0000FF,
-			uint32_t colorFtNone = 0x000000FF, uint32_t colorFtOn = 0x99999999, uint32_t colorFtDown = 0x666666FF
+			uint32_t colorBtNone = 0x22FF44AA, uint32_t colorBtOn = 0xFFFFFFAA, uint32_t colorBtDown = 0xFF0000AA,
+			uint32_t colorFtNone = 0x000000AA, uint32_t colorFtOn = 0x99999999, uint32_t colorFtDown = 0x666666AA
 		);
 		virtual ~Button();
 
@@ -74,7 +75,6 @@ namespace TM{
 		}
 
 		State getState() { return state; }
-		//bool pressed() { return state == State::ON && lastState == State::DOWN; }
 		bool pressed() { return state == State::ON && lastState == State::DOWN; }
 
 	// static

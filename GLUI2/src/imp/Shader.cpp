@@ -156,7 +156,7 @@ namespace TM {
 		if (txt) {
 			renderText(
 				comp->getFace().value(), comp->getText().value(), comp->getTextPos(), comp->getFontWidth(), comp->getFontHeight(), 1.0f, 
-				comp->getTextColor().value(), comp->shader->id, comp->shader->buffer.VAO, *comp->window
+				comp->getTextColor().value(), comp->shader->id, comp->shader->buffer.VAO, *comp->window, comp->getViewport()
 			);
 		}
 	}
@@ -229,7 +229,7 @@ namespace TM {
 
 	int Shader::renderText(
 		FT_Face face, std::string_view text, glm::vec2 pos, int width, int height, float scale,
-		const glm::vec4& color, unsigned int lastShader, unsigned int lastVAO, Window& window, bool getWidth
+		const glm::vec4& color, unsigned int lastShader, unsigned int lastVAO, Window& window, const Viewport vp, bool getWidth
 	) {
 
 		int outWidth = static_cast<int>(pos.x);
@@ -237,9 +237,8 @@ namespace TM {
 		float baselineY = 0;
 
 		if (!getWidth) {
-			glViewport(0, 0, window.width, window.height);
 
-			pos.y += window.height - 2 * pos.y - height;
+			pos.y = vp.h - pos.y - height;
 
 			// ===================== 【修复核心】字体级固定垂直参数（像素单位，无坐标溢出）=====================
 			// 1. FreeType 核心：必须把 字体设计单位 转为 像素单位（和你的Character像素匹配）
@@ -256,7 +255,7 @@ namespace TM {
 			baselineY = buttonCenterY - (lineHeightPx / 2.0f - descentPx);
 			// =============================================================================================
 
-			glm::mat4 projection = glm::ortho(0.0f, (float)window.width, 0.0f, (float)window.height);
+			glm::mat4 projection = glm::ortho(0.0f, (float)vp.w, 0.0f, (float)vp.h);
 			glUseProgram(sv.txtShader);
 			glUniformMatrix4fv(sv.projection, 1, GL_FALSE, glm::value_ptr(projection));
 

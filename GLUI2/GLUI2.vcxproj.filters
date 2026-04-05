@@ -92,10 +92,10 @@
     <ClCompile Include="src\imp\Text.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.cpp">
+    <ClCompile Include="src\imp\Container.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\imp\Container.cpp">
+    <ClCompile Include="src\example1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

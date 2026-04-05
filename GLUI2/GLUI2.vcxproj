@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\component\Button.h" />
     <ClInclude Include="include\component\Container.h" />
+    <ClInclude Include="include\component\Button.h" />
     <ClInclude Include="include\component\Event.h" />
     <ClInclude Include="include\component\Component.h" />
     <ClInclude Include="include\component\Rectangle.h" />
@@ -35,8 +35,9 @@
     <ClInclude Include="include\component\Text.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\imp\Button.cpp" />
+    <ClCompile Include="src\example1.cpp" />
     <ClCompile Include="src\imp\Container.cpp" />
+    <ClCompile Include="src\imp\Button.cpp" />
     <ClCompile Include="src\imp\Event.cpp" />
     <ClCompile Include="src\imp\Buffer.cpp" />
     <ClCompile Include="src\imp\Component.cpp" />
@@ -47,7 +48,6 @@
     <ClCompile Include="src\imp\Triangle.cpp" />
     <ClCompile Include="src\imp\Window.cpp" />
     <ClCompile Include="src\imp\Text.cpp" />
-    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

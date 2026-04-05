@@ -6,6 +6,7 @@
 #include "component/Triangle.h"
 #include "component/Text.h"
 #include "component/Button.h"
+#include "component/Container.h"
 
 #include <memory>
 #include <windows.h>
@@ -31,17 +32,30 @@ int main() {
         window, 0x00A0FF77
     );
 
-    auto rect3 = std::make_unique<TM::Rectangle>(100, 50, 20, 30, window, 0x0000FFFF);
-    auto rect4 = std::make_unique<TM::Rectangle>(600, 20, 20, 30, window, 0xFFFFFFFF);
-    auto rect5 = std::make_unique<TM::Rectangle>(200, 20, 20, 30, window, 0xFF00FFFF);
+    constexpr int gap = 20;
+    auto container1 = std::make_unique<TM::Container>(window, gap, gap, WIDTH / 2 - 2 * gap, HEIGHT - gap * 2);
+    auto container2 = std::make_unique<TM::Container>(window, WIDTH / 2, gap, WIDTH / 2 - 2 * gap, HEIGHT / 2 - 2 * gap);
+    auto container3 = std::make_unique<TM::Container>(window, WIDTH / 2, HEIGHT / 2, WIDTH / 2 - 2 * gap, HEIGHT / 2 - gap);
 
-    auto text1 = std::make_unique<TM::Text>(window, 50, 50, 50, u8"", 0x00AAFFFF, 0x00000077);
-    auto text2 = std::make_unique<TM::Text>(window, 50, 150, 150, u8"teŒƒ◊÷2st÷– Œƒ te ≤‚ ‘xt", 0xAA00FF77, 0x00000077);
-    auto text3 = std::make_unique<TM::Text>(window, 70, 300, 75, u8"≤‚ ‘", 0x32AF8988);
-    auto text4 = std::make_unique<TM::Text>(window, 37, 397, 75, u8"≤‚ ‘", 0x78AF89DD);
+    auto rect3 = std::make_unique<TM::Rectangle>(10, 20,  20,  30,  window, 0x0000FFFF);
+    auto rect4 = std::make_unique<TM::Rectangle>(10, 70,  20,  30,  window, 0xFF00FFFF);
+    auto rect5 = std::make_unique<TM::Rectangle>(10, 120, 25,  30,  window, 0xFFFFFFFF);
+	auto rect6 = std::make_unique<TM::Rectangle>(10, 165, 600, 400, window, 0x00FFAA33);
+
+	container1->pushChild(std::move(rect3));
+    container1->pushChild(std::move(rect4));
+    container1->pushChild(std::move(rect5));
+    container1->pushChild(std::move(rect6));
+
+    auto fpsStr = std::make_unique<TM::Text>(window, 50, 50,  50,  u8"", 0x00AAFFFF, 0x00000077);
+    auto text2 =  std::make_unique<TM::Text>(window, 50, 150, 150, u8"teŒƒ◊÷2st÷– Œƒ te ≤‚ ‘xt", 0xAA00FF77, 0x00000077);
+    auto text3 =  std::make_unique<TM::Text>(window, 70, 300, 75,  u8"≤‚ ‘", 0x32AF8988);
+    auto text4 =  std::make_unique<TM::Text>(window, 37, 397, 75,  u8"≤‚ ‘", 0x78AF89DD);
+	auto loc =    std::make_unique<TM::Text>(window, 37, 397, 75,  u8"", 0x78AF89DD);
 
     auto button1 = std::make_unique<TM::Button>(window, 250, 350, TM::DEFAULT_WIDTH, 100, u8"but∞¥≈•ton1");
     auto button2 = std::make_unique<TM::Button>(window, 250, 550, 400, 100, u8"but∞¥≈•ton2");
+	auto button3 = std::make_unique<TM::Button>(window, 10,  20,  600, 200, u8"in a container");
 
     window.bind();
     float deltaTime = 0;
@@ -50,23 +64,26 @@ int main() {
 
         deltaTime += window.deltaTime;
         if (deltaTime > 0.5f) {
-            text1->reset("FPS: " + window.getFPS());
+            fpsStr->reset("FPS: " + window.getFPS());
             deltaTime = 0;
         }
+
+		loc->reset("mouse: " + std::to_string(TM::Event::mouseMsg.x) + ", " + std::to_string(TM::Event::mouseMsg.y));
 
         rect1->render(); // <=> window.draw(rect1.get());
         tri1->render();
         rect2->render();
         text2->render();
-        rect3->render();
-        rect4->render();
-        rect5->render();
         tri2->render();
-        text1->render();
         button1->render();
         button2->render();
         text3->render();
         text4->render();
+		container1->render();
+        fpsStr->render();
+		container2->render();
+		container3->render();
+		loc->render();
 
         switch (button1->state) {
         case BtnState::DOWN:

@@ -21,27 +21,29 @@ namespace TM {
 	Component::~Component()
 	{
 		TM_println("Component destruct");
-		if (!parent) {
+		this->isDestorying = true;
+		if (!parent || parent->isDestorying) {
 			return;
 		}
-		for (auto itr = parent->children.begin(); itr != parent->children.end(); ++itr) {
-			if (itr->get() == this) {
-				parent->children.erase(itr);
+		for (int i = 0;i < parent->children.size();++i) {
+			if (parent->children[i].get() == this) {
+				//parent->children.erase(itr);
+				parent->deletedChildrenIndices.push(i);
 				break;
 			}
 		}
 	}
 
-	void Component::pushChild(std::unique_ptr<Component> _child)
-	{
-		TM_assertOr(_child != nullptr, "parent to be set is nullptr");
-		TM_assertOr(this != _child.get(), "child is itself error");
-		TM_assertOr(!this->hasAncestor(_child.get()), "child is already Ancestor of this");
-		TM_assertOr(!_child->parent, "child already has parent");
+	//void Component::pushChild(std::unique_ptr<Component> _child)
+	//{
+	//	TM_assertOr(_child != nullptr, "parent to be set is nullptr");
+	//	TM_assertOr(this != _child.get(), "child is itself error");
+	//	TM_assertOr(!this->hasAncestor(_child.get()), "child is already Ancestor of this");
+	//	TM_assertOr(!_child->parent, "child already has parent");
 
-		_child->parent = this;
-		this->children.emplace_back(std::move(_child));
-	}
+	//	_child->parent = this;
+	//	this->children.emplace_back(std::move(_child));
+	//}
 
 	bool Component::hasAncestor(Component* const prt)
 	{
@@ -57,6 +59,15 @@ namespace TM {
 		}
 
 		return false;
+	}
+
+	const std::vector<std::unique_ptr<Component>>& Component::getChildren()
+	{
+		while(!deletedChildrenIndices.empty()) {
+			children.erase(children.begin() + deletedChildrenIndices.top());
+			deletedChildrenIndices.pop();
+		}
+		return children;
 	}
 
 }

@@ -40,6 +40,10 @@
 
 namespace TM {
 
+	struct Viewport {
+		int x, y, w, h;
+	};
+
 	class Shader;
 	class Component;
 	class Window
@@ -87,9 +91,10 @@ namespace TM {
 	//static
 	TM_public:
 		static int countWindows;
+		static void setViewport(int x, int y, int w, int h) { glViewport(x, y, w, h); }
+		static void setViewport(Viewport vp) { glViewport(vp.x, vp.y, vp.w, vp.h); }
 
 	TM_private:
-		static void setViewport(int x, int y, int w, int h) { glViewport(x, y, w, h); }
 		static void setSizeCallback(GLFWwindow* window, int w, int h);
 		static void refreshCallback(GLFWwindow* window);
 	

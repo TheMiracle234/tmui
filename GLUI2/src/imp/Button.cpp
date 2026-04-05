@@ -91,7 +91,8 @@ namespace TM{
 			ok = true;
 		}
 
-		glm::mat4 projection = glm::ortho(0.0f, (float)window->width, (float)window->height, 0.0f);
+		auto vp = getViewport();
+		glm::mat4 projection = glm::ortho(0.0f, (float)vp.w, (float)vp.h, 0.0f);
 		shader->setUniform("uColor", colorOf(state, Layer::BACK));
 		shader->setUniform("projection", projection);
 		shader->setUniform("pos1", position);

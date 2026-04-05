@@ -33,7 +33,7 @@ namespace TM {
 
 	TM_public:
 		unsigned int getGlDrawMode() const override { return GL_TRIANGLES; }
-		glm::vec2 getPos() override { return getUpLeft(); }
+		glm::vec2 getRelPos() override { return getUpLeft(); }
 		void update() override;
 
 	};

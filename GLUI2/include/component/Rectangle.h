@@ -12,8 +12,13 @@ namespace TM {
 		float width;
 		float height;
 
-		const glm::vec2 position;
+		glm::vec2 position;
 		glm::vec4 rectColor;
+
+		Rectangle(
+			float x, float y, float _width, float _height, Window& _window,
+			uint32_t RGBA = 0x4477FFFF, std::unique_ptr<Component> _child = nullptr, const std::shared_ptr<Shader>& _shader = nullptr, bool loadData = true
+		);
 
 	TM_public:
 		Rectangle(
@@ -36,7 +41,7 @@ namespace TM {
 
 	TM_public:
 		unsigned int getGlDrawMode() const override { return GL_TRIANGLES; }
-		glm::vec2 getPos() override { return position; }
+		glm::vec2 getRelPos() override { return position; }
 		void update() override;
 	};
 

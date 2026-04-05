@@ -6,6 +6,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace TM {
+	
+	Rectangle::Rectangle(
+		float x, float y, float _width, float _height, Window& _window, uint32_t RGBA,
+		std::unique_ptr<Component> _child, const std::shared_ptr<Shader>& _shader, bool loadData
+	) :
+		Component(_shader ? _shader : defaultShader(), _window, std::move(_child)),
+		width(_width), height(_height),
+		position(x, y), rectColor(colorOf(RGBA))
+	{
+		if (loadData) {
+			TM_COMP_INIT;
+		}
+	}
 
 	Rectangle::Rectangle(
 		int x, int y, int _width, int _height, Window& _window, uint32_t RGBA,
@@ -89,7 +102,8 @@ namespace TM {
 	void Rectangle::update()
 	{
 		shader->setUniform("uColor", rectColor);
-		glm::mat4 projection = glm::ortho(0.0f, (float)window->width, (float)window->height, 0.0f);
+		auto vp = getViewport();
+		glm::mat4 projection = glm::ortho(0.0f, (float)vp.w, (float)vp.h, 0.0f);
 		shader->setUniform("projection", projection);
 	}
 

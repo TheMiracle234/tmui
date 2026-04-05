@@ -8,6 +8,9 @@
 #include <glm/vec4.hpp>
 
 namespace TM {
+
+	constexpr const char* DEFAULT_FONT_PATH = "fonts/msyh.ttc";
+
 	class Text : TM_public Rectangle {
 	TM_protected:
 		FT_Face face;
@@ -20,18 +23,21 @@ namespace TM {
 			std::string_view fontPath = "fonts/msyh.ttc", const std::shared_ptr<Shader>& _shader = nullptr, int h = 0
 		);
 
+		virtual ~Text();
+
 		void reset(std::string_view u8str) { txt = u8str; }
 		int getTextWidth() { 
 			if (width) { return static_cast<int>(width); }
 			return shader->renderText(
 				getFace().value(), getText().value(), getTextPos(), getFontWidth(), getFontHeight(), 1.0f,
-				getTextColor().value(), shader->id, shader->getVAO(), *window
+				getTextColor().value(), shader->id, shader->getVAO(), *window, getViewport()
 			);
 		}
 
 	// override
 	TM_public:
-		glm::vec2 getTextPos() override { return getPos(); }
+		// relative pos in viewport
+		glm::vec2 getTextPos() override { return getRelPos(); }
 		std::optional<std::string_view> getText() override { return txt; }
 		std::optional<FT_Face> getFace() override { return face; }
 		std::optional<glm::vec4> getTextColor() override { return txtColor; }

@@ -1,23 +1,29 @@
 #pragma once
 
-#include "component/Rectangle.h"
+#include "component/Component.h"
 
 namespace TM
 {
-	class Container : TM_public Rectangle {
-	TM_public:
-		Container(
-			Window& window, int x, int y, int width, int height, uint32_t RGBA = 0x4477FF11, 
-			std::unique_ptr<Component> child = nullptr, const std::shared_ptr<Shader>& shader = nullptr
-		);
-		virtual ~Container() = default;
+	class Container: public Component
+	{
+	TM_private:
+		glm::vec2 pos;
+		float width;
+		float height;
 
-	// override
 	TM_public:
-		std::optional<Viewport> getViewport() { return Viewport{ (int)position.x, (int)position.y, (int)width, (int)height }; }
+		Container(Window& window, int x, int y, int w, int h, uint32_t bkRGBA = 0x44444444, std::unique_ptr<Component> _child = nullptr);
 
+	// static
 	TM_protected:
-		void initVerticesIndices() override;
-		void initIndicesPos() override;
+		void initVerticesIndices() {};
+		void initIndicesPos() {};
+
+	TM_public:
+		const Viewport getViewport() override ;
+		unsigned int getGlDrawMode() const override { return 0; }
+		glm::vec2 getRelPos() override { return pos; }
+		void update() override {};
 	};
 }
+

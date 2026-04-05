@@ -106,6 +106,8 @@ namespace TM {
 
 	void Window::_drawWithoutCompClear(Component* const component)
 	{
+		TM_assertOr(component != nullptr, "component drawn in the window is nullptr");
+
 		std::queue<Component*> comps;
 		Component* itr;
 		comps.push(component);
@@ -118,7 +120,8 @@ namespace TM {
 			TM_assertOr(itr != nullptr, "component drawn in the window is nullptr");
 
 			if (itr->isActive()) {
-				for (auto& c : itr->children) {
+				auto& children = itr->getChildren();
+				for (auto& c : children) {
 					comps.push(c.get());
 				}
 			}
@@ -136,9 +139,9 @@ namespace TM {
 			itr->update();
 
 			auto vp = itr->getViewport();
-			if (vp) {
-				setViewport(vp->x, height - (vp->y + vp->h), vp->w, vp->h);
-			}
+			setViewport(vp.x, height - (vp.y + vp.h), vp.w, vp.h);
+
+
 			shader->draw(itr);
 			// == core part ==
 

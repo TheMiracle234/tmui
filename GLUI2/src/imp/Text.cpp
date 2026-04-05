@@ -15,4 +15,8 @@ namespace TM {
 
 		TM_COMP_INIT;
 	}
+	Text::~Text()
+	{
+		TM_assertOr(!FT_Done_Face(face), "Failed to free font face!");
+	}
 }

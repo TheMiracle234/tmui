@@ -29,6 +29,7 @@ namespace TM {
 	struct IndicesPos;
 	class Component;
 	class Window;
+	struct Viewport;
 	
 	// actually renderer
 	class Shader
@@ -65,7 +66,7 @@ namespace TM {
 		// if getWidth, no render and return the txt width
 		int renderText(
 			FT_Face face, std::string_view text, glm::vec2 pos, int width, int height, float scale,
-			const glm::vec4& color, unsigned int lastShader, unsigned int lastVAO, Window& window, bool getWidth = false
+			const glm::vec4& color, unsigned int lastShader, unsigned int lastVAO, Window& window, const Viewport vp, bool getWidth = false
 		);
 
 	//static
@@ -114,7 +115,7 @@ namespace TM {
 
 	// ================== implementations ==================
 	template< typename func, typename ...Args>
-	std::enable_if_t<std::is_invocable_v<func, int, Args...>, void> //void
+	std::enable_if_t<std::is_invocable_v<func, int, Args...>, void>
 	inline Shader::shaderSetUniform(const func& glUniform, const std::string& name, Args&&... args) {
 		if (uniformLocations.count(name) != 0) {
 			glUniform(uniformLocations[name], std::forward<Args>(args)...);
