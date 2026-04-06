@@ -9,7 +9,7 @@
 
 namespace TM {
 
-	constexpr const char* DEFAULT_FONT_PATH = "fonts/msyh.ttc";
+	inline constexpr const char* DEFAULT_FONT_PATH = "fonts/msyh.ttc";
 
 	class Text : TM_public Rectangle {
 	TM_protected:

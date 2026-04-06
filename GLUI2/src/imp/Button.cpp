@@ -9,11 +9,11 @@ namespace TM{
 	):
 		Text(window, x, y, h, _u8str, colorFtNone, colorBtNone, fontPath, btnDefaultShader(), w)
 	{
-		setColorOf(TM::colorOf(colorBtOn), State::ON, Layer::BACK);
-		setColorOf(TM::colorOf(colorBtDown), State::DOWN, Layer::BACK);
-		setColorOf(TM::colorOf(colorFtOn), State::ON, Layer::FRONT);
-		setColorOf(TM::colorOf(colorFtDown), State::DOWN, Layer::FRONT);
-		setColorOf(TM::colorOf(colorFtNone), State::NONE, Layer::FRONT);
+		setColorOf(TM::colorOf(colorBtOn), BtnState::ON, BtnLayer::BACK);
+		setColorOf(TM::colorOf(colorBtDown), BtnState::DOWN, BtnLayer::BACK);
+		setColorOf(TM::colorOf(colorFtOn), BtnState::ON, BtnLayer::FRONT);
+		setColorOf(TM::colorOf(colorFtDown), BtnState::DOWN, BtnLayer::FRONT);
+		setColorOf(TM::colorOf(colorFtNone), BtnState::NONE, BtnLayer::FRONT);
 	}
 
 	std::shared_ptr<Shader> Button::btnDefaultShader(bool destruct)
@@ -80,9 +80,9 @@ namespace TM{
 		
 		bool mouse_on = mouseOn();
 
-		if (ok && mouseDown()) { state = State::DOWN; }
-		else if(mouse_on) { state = State::ON; }
-		else { state = State::NONE; }
+		if (ok && mouseDown()) { state = BtnState::DOWN; }
+		else if(mouse_on) { state = BtnState::ON; }
+		else { state = BtnState::NONE; }
 
 		if (Event::mouseMsg.action == Action::PRESS && (!mouse_on || !ok)) {
 			ok = false;
@@ -93,14 +93,58 @@ namespace TM{
 
 		auto vp = getViewport();
 		glm::mat4 projection = glm::ortho(0.0f, (float)vp.w, (float)vp.h, 0.0f);
-		shader->setUniform("uColor", colorOf(state, Layer::BACK));
-		shader->setUniform("projection", projection);
-		shader->setUniform("pos1", position);
-		shader->setUniform("pos4", { position.x + width, position.y + height});
-		renewFrontColor(colorOf(state, Layer::FRONT));
+		shader->setUniform("uColor", &colorOf(state, BtnLayer::BACK));
+		shader->setUniform("projection", &projection);
+		shader->setUniform("pos1", &position);
+		glm::vec2 pos4 = { position.x + width, position.y + height };
+		shader->setUniform("pos4", &pos4);
+		renewFrontColor(colorOf(state, BtnLayer::FRONT));
 	}
 
 	Button::~Button()
+	{
+		btnDefaultShader(true);
+	}
+
+
+	LiteBtn::LiteBtn(
+		Window& window, int x, int y, int w, int h, std::string_view _u8str, std::string_view fontPath,
+		uint32_t colorBtNone, uint32_t colorBtOn, uint32_t colorFtNone, uint32_t colorFtOn
+	) :
+		Text(window, x, y, h, _u8str, colorFtNone, colorBtNone, fontPath, btnDefaultShader(), w)
+	{
+		setColorOf(TM::colorOf(colorBtNone), BtnState::NONE, BtnLayer::BACK);
+		setColorOf(TM::colorOf(colorFtOn), BtnState::ON, BtnLayer::BACK);
+		setColorOf(TM::colorOf(colorFtNone), BtnState::NONE, BtnLayer::FRONT);
+	}
+
+	void LiteBtn::update() {
+
+		lastState = state;
+
+		bool mouse_on = mouseOn();
+
+		if (ok && mouseDown()) { state = BtnState::DOWN; }
+		else if (mouse_on) { state = BtnState::ON; }
+		else { state = BtnState::NONE; }
+
+		if (Event::mouseMsg.action == Action::PRESS && (!mouse_on || !ok)) {
+			ok = false;
+		}
+		else {
+			ok = true;
+		}
+
+		auto vp = getViewport();
+		glm::mat4 projection = glm::ortho(0.0f, (float)vp.w, (float)vp.h, 0.0f);
+		shader->setUniform("uColor", &colorOf(state, BtnLayer::BACK));
+		shader->setUniform("projection", &projection);
+		shader->setUniform("pos1", &position);
+		glm::vec2 pos4 = { position.x + width, position.y + height };
+		shader->setUniform("pos4", &pos4);
+	}
+
+	LiteBtn::~LiteBtn()
 	{
 		btnDefaultShader(true);
 	}

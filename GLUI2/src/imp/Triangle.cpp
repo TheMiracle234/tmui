@@ -64,10 +64,10 @@ namespace TM {
 
 	void Triangle::update()
 	{
-		shader->setUniform("uColor", color);
+		shader->setUniform("uColor", &color);
 		auto vp = getViewport();
 		glm::mat4 projection = glm::ortho(0.0f, (float)vp.w, (float)vp.h, 0.0f);
-		shader->setUniform("projection", projection);
+		shader->setUniform("projection", &projection);
 	}
 
 }

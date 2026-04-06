@@ -15,11 +15,6 @@ namespace TM {
 		glm::vec2 position;
 		glm::vec4 rectColor;
 
-		Rectangle(
-			float x, float y, float _width, float _height, Window& _window,
-			uint32_t RGBA = 0x4477FFFF, std::unique_ptr<Component> _child = nullptr, const std::shared_ptr<Shader>& _shader = nullptr, bool loadData = true
-		);
-
 	TM_public:
 		Rectangle(
 			int x, int y, int _width, int _height, Window& _window, 

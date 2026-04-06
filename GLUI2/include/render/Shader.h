@@ -60,9 +60,11 @@ namespace TM {
 		Data& getData() { return data; }
 		Buffer& getBuffer() { return buffer; }
 		void loadData() { buffer.setDataOf(data, glDrawType); dataLoaded = true; }
-		void setUniform(const std::string& name, const glm::vec4& v) { shaderSetUniform(glUniform4fv, name, 1, glm::value_ptr(v)); }
-		void setUniform(const std::string& name, const glm::vec2& v) { shaderSetUniform(glUniform2fv, name, 1, glm::value_ptr(v)); }
-		void setUniform(const std::string& name, const glm::mat4& v) { shaderSetUniform(glUniformMatrix4fv, name, 1, GL_FALSE, glm::value_ptr(v)); }
+		void setUniform(const std::string& name, const int* v, int count = 1)		{ shaderSetUniform(glUniform1iv, name, count, v); }
+		void setUniform(const std::string& name, const float* v, int count = 1)		{ shaderSetUniform(glUniform1fv, name, count, v); }
+		void setUniform(const std::string& name, const glm::vec2* v, int count = 1) { shaderSetUniform(glUniform2fv, name, count, &(*v)[0]); }
+		void setUniform(const std::string& name, const glm::vec4* v, int count = 1) { shaderSetUniform(glUniform4fv, name, count, &(*v)[0]); }
+		void setUniform(const std::string& name, const glm::mat4* v, int count = 1) { shaderSetUniform(glUniformMatrix4fv, name, count, GL_FALSE, &(*v)[0][0]); }
 		// if getWidth, no render and return the txt width
 		int renderText(
 			FT_Face face, std::string_view text, glm::vec2 pos, int width, int height, float scale,

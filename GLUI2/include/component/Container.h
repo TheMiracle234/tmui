@@ -13,6 +13,7 @@ namespace TM
 
 	TM_public:
 		Container(Window& window, int x, int y, int w, int h, uint32_t bkRGBA = 0x44444444, std::unique_ptr<Component> _child = nullptr);
+		virtual ~Container(){}
 
 	// static
 	TM_protected:

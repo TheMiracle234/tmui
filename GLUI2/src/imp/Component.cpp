@@ -3,7 +3,7 @@
 #include "debug/debug.h"
 
 #include <iostream>
-#include <queue>
+#include <algorithm>
 
 #include <GL/glew.h>
 
@@ -13,6 +13,7 @@ namespace TM {
 		shader(_shader), window(&_window)
 	{
 		TM_println("Component construct");
+		window->pushComp(this);
 		if(_child){
 			pushChild(std::move(_child));
 		}
@@ -21,29 +22,25 @@ namespace TM {
 	Component::~Component()
 	{
 		TM_println("Component destruct");
-		this->isDestorying = true;
-		if (!parent || parent->isDestorying) {
+		this->flags |= IS_DESTROYING;
+		// parent delete it
+		if (parent && !(parent->flags & IS_DESTROYING)) {
 			return;
-		}
-		for (int i = 0;i < parent->children.size();++i) {
-			if (parent->children[i].get() == this) {
-				//parent->children.erase(itr);
-				parent->deletedChildrenIndices.push(i);
-				break;
+			for (int i = 0;i < parent->children.size();++i) {
+				if (parent->children[i].get() == this) {
+					parent->deletedChildrenIndices.push_back(i);
+					break;
+				}
 			}
 		}
+		//window delete it
+		auto& comps = window->components;
+		auto it = std::find(comps.begin(), comps.end(), this);
+		if (it != comps.end()) {
+			TM_println("erase borrow");
+			comps.erase(it);
+		}
 	}
-
-	//void Component::pushChild(std::unique_ptr<Component> _child)
-	//{
-	//	TM_assertOr(_child != nullptr, "parent to be set is nullptr");
-	//	TM_assertOr(this != _child.get(), "child is itself error");
-	//	TM_assertOr(!this->hasAncestor(_child.get()), "child is already Ancestor of this");
-	//	TM_assertOr(!_child->parent, "child already has parent");
-
-	//	_child->parent = this;
-	//	this->children.emplace_back(std::move(_child));
-	//}
 
 	bool Component::hasAncestor(Component* const prt)
 	{
@@ -63,9 +60,17 @@ namespace TM {
 
 	const std::vector<std::unique_ptr<Component>>& Component::getChildren()
 	{
-		while(!deletedChildrenIndices.empty()) {
-			children.erase(children.begin() + deletedChildrenIndices.top());
-			deletedChildrenIndices.pop();
+		if (!deletedChildrenIndices.empty()) {
+			std::sort(deletedChildrenIndices.begin(), deletedChildrenIndices.end(),
+				[](int x, int y) {
+					return x < y;
+				}
+			);
+			// there is no need to optimize it since it's just few in loops
+			do{
+				children.erase(children.begin() + deletedChildrenIndices.back());
+				deletedChildrenIndices.pop_back();
+			} while (!deletedChildrenIndices.empty());
 		}
 		return children;
 	}

@@ -35,6 +35,7 @@
 
 #include <glm/vec4.hpp>
 
+#include "component/Event.h"
 #include "util/util.h"
 #include "debug/macros.h"
 
@@ -44,18 +45,33 @@ namespace TM {
 		int x, y, w, h;
 	};
 
+	inline constexpr int NO_LIMIT = GLFW_DONT_CARE;
+
 	class Shader;
 	class Component;
+	// windows only borrows root components (comp.hasAncestor() == false)
 	class Window
 	{
-
+		friend class Component;
 	TM_private:
+		using FlagType = uint8_t;
+		enum : FlagType{
+			NONE =					0,
+			IS_LOOPING =			0x01,
+			COMP_ORDER_CHANGED =	0x02,
+		};
+
+		FlagType flags = NONE; // universal flags
 		int minWidth = 200;
 		int minHeight = 200;
+		int maxWidth = NO_LIMIT;
+		int maxHeight = NO_LIMIT;
 		std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> window;
 		std::chrono::steady_clock::time_point m_lastTimePoint;
 		glm::vec4 color; // this is stupied but necessary for now. cuz of refreshCallback things
-		std::vector<Component*> components; // just for draw loop callback 
+		// just for draw loop. this is a borrow, not an ownership, so no smart ptr
+		// if any component is destructed, destructor of Component will remove its borrow
+		std::vector<Component*> components;
 		Shader* lastShader = nullptr; // save state
 
 	TM_public:
@@ -68,24 +84,37 @@ namespace TM {
 	TM_private:
 		void update();
 		void _clearWithOutCompClear();
-		void _drawWithoutCompClear(Component * const component);
+		//void _drawWithoutCompClear(Component * const component);
+		void pushComp(Component* const comp);
+		void thingsBeforeDrawLoop();
+		void setCompOrderChanged() { flags |= COMP_ORDER_CHANGED; }
+		void clear();
+		// before swapBuffers, all the comps borrowed will be drawn
+		template<bool renderInside = true>
+		void swapBuffers() {
+			if constexpr (renderInside) {
+				for (auto comp : components) {
+					comp->render();
+				}
+			}
+			glfwSwapBuffers(window.get());
+			glfwPollEvents();
+			Event::mouseMsg.setOldPos();
+		}
 
 	TM_public:
 		explicit Window(int w, int h, std::string_view title, uint32_t bk_RGBA = 0x4477FFFF);
 		~Window();
+
 		auto& get() { return window; }
-
 		void draw(Component* const component);
-
-		void bind()	{ glfwMakeContextCurrent(window.get());}
-		bool closed() { return glfwWindowShouldClose(window.get()); }
-		void close() { glfwSetWindowShouldClose(window.get(), true); }
-		void setMinWidth(int w) { minWidth = w == 0 ? minWidth : w; glfwSetWindowSizeLimits(window.get(), minWidth, minHeight, GLFW_DONT_CARE, GLFW_DONT_CARE);}
-		void setMinHeight(int h) { minHeight = h == 0 ? minHeight : h; glfwSetWindowSizeLimits(window.get(), minWidth, minHeight, GLFW_DONT_CARE, GLFW_DONT_CARE);}
-		void clear() { setViewport(0, 0, width, height); _clearWithOutCompClear(); components.clear(); }
-		void swapBuffers();
-		void setBackColor(uint32_t RGBA) { color = colorOf(RGBA); }
-		void setBackColor(const glm::vec4& _color) { color = _color; }
+		void bind()					{ glfwMakeContextCurrent(window.get()); components.clear(); flags &= ~IS_LOOPING; }
+		void close()				{ glfwSetWindowShouldClose(window.get(), true); }
+		template<bool renderInside = true>
+		bool closed()				{ swapBuffers<renderInside>(); clear(); return glfwWindowShouldClose(window.get()); }
+		void setSizeRange(int minW, int minH, int maxW, int maxH);
+		void setBackColor(uint32_t RGBA)			{ color = colorOf(RGBA); }
+		void setBackColor(const glm::vec4& _color)	{ color = _color; }
 		std::string getFPS(int8_t presition = 2);
 
 	//static

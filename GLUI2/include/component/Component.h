@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <queue>
 #include <memory>
 #include <optional>
 
@@ -25,18 +24,25 @@ namespace TM {
 		int count;
 	};
 
+
 	class Component
 	{	
 	TM_private:
-		bool isDestorying = false;
+		using FlagType = uint8_t;
+		enum : FlagType {
+			NONE = 0x00,
+			IS_DESTROYING = 0x01,
+			ACTIVE = 0x02,
+		};
+		FlagType flags = ACTIVE;
 		std::vector<std::unique_ptr<Component>> children;
-		std::priority_queue<int> deletedChildrenIndices;
+		std::vector<int> deletedChildrenIndices;
 	
 	TM_protected:
-		Component* parent;// this ptr should be set null only by its parent
-		bool active = true; // render or not
+		Component* parent = nullptr;// this ptr should be set null only by its parent
 		
 	TM_public:
+		int8_t priority = 0; // biggest one first
 		IndicesPos indicesPos;
 		std::shared_ptr<Shader> shader; // if shader == nullptr, it wouldn't be rendered but it's ok.
 		Window* window;
@@ -56,17 +62,19 @@ namespace TM {
 			this->children.emplace_back(std::move(_child));
 			return static_cast<T*>(this->children.back().get());
 		}
-
+		bool hasAncestor() { return parent; }
 		bool hasAncestor(Component* const prt);
 		const std::vector<std::unique_ptr<Component>>& getChildren();
 		void resetWindowTo(Window& _window)					{ window = &_window; }
 		Data& getData()										{ return shader->getData(); }
 		const IndicesPos& getIndicesPos()					{ return indicesPos; }
 		const std::shared_ptr<Shader>& getShader()			{ return shader; }
-		void render()				{ window->draw(this); }
-		bool isActive()				{ return active; }
-		void activate()				{ active = true; }
-		void deactivate()			{ active = false; }
+		void render()		{ window->draw(this); }
+		bool isActive()		{ return flags & ACTIVE; }
+		void activate()		{ flags |= ACTIVE; }
+		void deactivate()	{ flags &= ~ACTIVE; }
+		// default 0. this should between -128~127, cus if its too big, there must be something wrong with your design
+		void setPriority(int8_t prio)	{ priority = prio; window->setCompOrderChanged(); }
 		// pos in window
 		glm::vec2 getAbsPos() {
 			auto vp = getViewport();

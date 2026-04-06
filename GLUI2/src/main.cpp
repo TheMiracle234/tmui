@@ -14,6 +14,7 @@
 int main() {
     using glm::vec2;
     using BtnState = TM::Button::State;
+    using TM::U8;
 
     constexpr int WIDTH = 1000;
     constexpr int HEIGHT = 800;
@@ -47,15 +48,15 @@ int main() {
     container1->pushChild(std::move(rect5));
     container1->pushChild(std::move(rect6));
 
-    auto fpsStr = std::make_unique<TM::Text>(window, 50, 50,  50,  u8"", 0x00AAFFFF, 0x00000077);
-    auto text2 =  std::make_unique<TM::Text>(window, 50, 150, 150, u8"te文字2st中 文 te 测试xt", 0xAA00FF77, 0x00000077);
-    auto text3 =  std::make_unique<TM::Text>(window, 70, 300, 75,  u8"测试", 0x32AF8988);
-    auto text4 =  std::make_unique<TM::Text>(window, 37, 397, 75,  u8"测试", 0x78AF89DD);
-	auto loc =    std::make_unique<TM::Text>(window, 37, 397, 75,  u8"", 0x78AF89DD);
+    auto fpsStr = std::make_unique<TM::Text>(window, 50, 50,  50,  U8(""), 0x00AAFFFF, 0x00000077);
+    auto text2 =  std::make_unique<TM::Text>(window, 50, 150, 150, U8("te文字2st中 文 te 测试xt"), 0xAA00FF77, 0x00000077);
+    auto text3 =  std::make_unique<TM::Text>(window, 70, 300, 75,  U8("测试"), 0x32AF8988);
+    auto text4 =  std::make_unique<TM::Text>(window, 37, 397, 75,  U8("测试"), 0x78AF89DD);
+	auto loc =    std::make_unique<TM::Text>(window, 37, 397, 75,  U8(""), 0x78AF89DD);
 
-    auto button1 = std::make_unique<TM::Button>(window, 250, 350, TM::DEFAULT_WIDTH, 100, u8"but按钮ton1");
-    auto button2 = std::make_unique<TM::Button>(window, 250, 550, 400, 100, u8"but按钮ton2");
-	auto button3 = std::make_unique<TM::Button>(window, 10,  20,  600, 200, u8"in a container");
+    auto button1 = std::make_unique<TM::Button>(window, 250, 350, TM::DEFAULT_WIDTH, 100, U8"but按钮ton1"));
+    auto button2 = std::make_unique<TM::Button>(window, 250, 550, 400, 100, U8("but按钮ton2"));
+	auto button3 = std::make_unique<TM::Button>(window, 10,  20,  600, 200, U8("in a container"));
 
     window.bind();
     float deltaTime = 0;

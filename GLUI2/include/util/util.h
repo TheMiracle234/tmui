@@ -24,6 +24,29 @@ namespace TM {
 		return colorOf(r, g, b, a);
 	}
 
+	inline uint32_t rgbaOf(const glm::vec4& color) {
+		uint32_t r = static_cast<uint32_t>(color.r * 0xFF) & 0xFF;
+		uint32_t g = static_cast<uint32_t>(color.g * 0xFF) & 0xFF;
+		uint32_t b = static_cast<uint32_t>(color.b * 0xFF) & 0xFF;
+		uint32_t a = static_cast<uint32_t>(color.a * 0xFF) & 0xFF;
+		return (r << 24) | (g << 16) | (b << 8) | a;
+	}
+
+	inline uint32_t rgbaOf(const glm::ivec4& color) {
+		uint32_t r = static_cast<uint32_t>(color.r) & 0xFF;
+		uint32_t g = static_cast<uint32_t>(color.g) & 0xFF;
+		uint32_t b = static_cast<uint32_t>(color.b) & 0xFF;
+		uint32_t a = static_cast<uint32_t>(color.a) & 0xFF;
+		return (r << 24) | (g << 16) | (b << 8) | a;
+	}
+
+	template<typename T>
+	inline T clamp(T value, T min, T max) {
+		if (value < min) return min;
+		if (value > max) return max;
+		return value;
+	}
+
 	template<typename Ptr>
 	inline Ptr cp(Ptr ptr) {
 #ifndef NDEBUG

@@ -5,7 +5,6 @@
 #include <glm/vec2.hpp>
 
 #include "debug/debug.h"
-#include "window/Window.h"
 #include <iostream>
 
 namespace TM {

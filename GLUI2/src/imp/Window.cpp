@@ -7,6 +7,7 @@
 
 #include <queue>
 #include <iostream>
+#include <algorithm>
 
 namespace TM {
 
@@ -22,7 +23,7 @@ namespace TM {
 		auto tm_window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 		tm_window->_clearWithOutCompClear();
 		for (auto& component : tm_window->components) {
-			tm_window->_drawWithoutCompClear(component);
+			tm_window->draw(component);
 		}
 		glfwSwapBuffers(tm_window->window.get());
 	}
@@ -51,6 +52,8 @@ namespace TM {
 			TM_assertOr(glewInit() == GLEW_OK, "GLEW init error");
 			TM_println("glewInit");
 			glEnable(GL_BLEND);
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LEQUAL);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // for font render
 
@@ -82,6 +85,26 @@ namespace TM {
 		TM_println("window destruction");
 	}
 
+	void Window::thingsBeforeDrawLoop() {
+		for (auto itr = components.begin(); itr != components.end();) {
+			if ((*itr)->hasAncestor()) {
+				itr = components.erase(itr);
+			}
+			else {
+				++itr;
+			}
+		}
+	}
+
+	void Window::clear() {
+		if (!(flags & IS_LOOPING)) {
+			thingsBeforeDrawLoop();
+			flags |= IS_LOOPING;
+		}
+		setViewport(0, 0, width, height);
+		_clearWithOutCompClear();
+	}
+
 	void Window::_clearWithOutCompClear()
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
@@ -89,11 +112,18 @@ namespace TM {
 		update();
 	}
 
-	void Window::swapBuffers()
+	void Window::pushComp(Component* const comp) {
+		TM_assertOr(comp != nullptr, "component drawn in the window is nullptr"); 
+		components.push_back(comp);
+	}
+
+	void Window::setSizeRange(int minW, int minH, int maxW, int maxH)
 	{
-		glfwSwapBuffers(window.get()); 
-		glfwPollEvents();
-		Event::mouseMsg.setOldPos();
+		minWidth = minW;
+		minHeight = minH;
+		maxWidth = maxW;
+		maxHeight = maxH;
+		glfwSetWindowSizeLimits(window.get(), minWidth, minHeight, maxWidth, maxHeight);
 	}
 
 	std::string Window::getFPS(int8_t presition)
@@ -104,53 +134,37 @@ namespace TM {
 		return str;
 	}
 
-	void Window::_drawWithoutCompClear(Component* const component)
-	{
-		TM_assertOr(component != nullptr, "component drawn in the window is nullptr");
-
-		std::queue<Component*> comps;
-		Component* itr;
-		comps.push(component);
-		
-		while (!comps.empty()) {
-			itr = comps.front();
-			comps.pop();
-
-			// == core part ==
-			TM_assertOr(itr != nullptr, "component drawn in the window is nullptr");
-
-			if (itr->isActive()) {
-				auto& children = itr->getChildren();
-				for (auto& c : children) {
-					comps.push(c.get());
-				}
-			}
-
-			if (!itr->shader) {
-				continue;
-			}
-
-			Shader* shader = itr->getShader().get();
-			if (lastShader != shader) {
-				lastShader = shader;
-				shader->bind();
-			}
-
-			itr->update();
-
-			auto vp = itr->getViewport();
-			setViewport(vp.x, height - (vp.y + vp.h), vp.w, vp.h);
-
-
-			shader->draw(itr);
-			// == core part ==
-
-		}
-	}
-
 	void Window::draw(Component* const component) {
-		_drawWithoutCompClear(component);
-		components.push_back(component);
+
+		std::vector<Component*> stack;
+		stack.push_back(component);
+
+		while (!stack.empty()) {
+			Component* node = stack.back();
+			stack.pop_back();
+
+			TM_assertOr(node != nullptr, "component drawn in the window is nullptr");
+			TM_assertOr(node->window == this, "component maybe deleted or drawn by mismatched window");
+			if (!node->isActive())
+				continue;
+
+			Shader* shader = node->getShader().get();
+			if (shader) {
+				if (lastShader != shader) {
+					lastShader = shader;
+					shader->bind();
+				}
+				node->update();
+				auto vp = node->getViewport();
+				setViewport(vp.x, height - (vp.y + vp.h), vp.w, vp.h);
+				shader->draw(node);
+			}
+
+			auto& children = node->getChildren();
+			for (auto it = children.rbegin(); it != children.rend(); ++it) {
+				stack.push_back(it->get());
+			}
+		}
 	}
 
 	void Window::update()
@@ -161,6 +175,14 @@ namespace TM {
 		auto now = std::chrono::high_resolution_clock::now();
 		deltaTime = std::chrono::duration<float>(now - m_lastTimePoint).count();
 		m_lastTimePoint = now;
+
+		if (flags & COMP_ORDER_CHANGED) {
+			std::stable_sort(components.begin(), components.end(),
+				[](Component* c1, Component* c2) {
+					return c1->priority > c2->priority;
+				});
+			flags &= ~COMP_ORDER_CHANGED;
+		}
 	}
 
 }
