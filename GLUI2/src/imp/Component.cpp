@@ -14,6 +14,7 @@ namespace TM {
 	{
 		TM_println("Component construct");
 		window->pushComp(this);
+		flags.set(ACTIVE);
 		if(_child){
 			pushChild(std::move(_child));
 		}
@@ -22,9 +23,9 @@ namespace TM {
 	Component::~Component()
 	{
 		TM_println("Component destruct");
-		this->flags |= IS_DESTROYING;
+		this->flags.set(IS_DESTROYING);
 		// parent delete it
-		if (parent && !(parent->flags & IS_DESTROYING)) {
+		if (parent && !(parent->flags[IS_DESTROYING])) {
 			return;
 			for (int i = 0;i < parent->children.size();++i) {
 				if (parent->children[i].get() == this) {

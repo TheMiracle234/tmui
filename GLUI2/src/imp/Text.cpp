@@ -8,11 +8,8 @@ namespace TM {
 		Rectangle(x,y, h, size, window, _bkRGBA, nullptr, _shader, false), txt(_u8str), txtColor(colorOf(_txtRGBA))
 	{
         TM_assertOr(!FT_New_Face(Shader::sv.ft, fontPath.data(), 0, &face), "Failed to load font!");
-
         FT_Set_Pixel_Sizes(face, static_cast<unsigned int>(height), static_cast<unsigned int>(height)); // 设置字体大小
-
 		width = static_cast<float>(getTextWidth());
-
 		TM_COMP_INIT;
 	}
 	Text::~Text()

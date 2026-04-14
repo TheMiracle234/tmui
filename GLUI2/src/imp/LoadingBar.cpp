@@ -101,7 +101,7 @@ namespace TM {
 	void SizableBar::update() {
 		int isXDir = direction == Axis::x;
 		auto vp = getViewport();
-		glm::mat4 projection = glm::ortho(0.0f, (float)vp.w, (float)vp.h, 0.0f, -1.0f, 1.0f);
+		glm::mat4 projection = glm::ortho(0.0f, (float)vp.w, (float)vp.h, 0.0f);
 		shader->setUniform("uColor", &barColor);
 		shader->setUniform("currPos", &currPos);
 		shader->setUniform("isXDir", &isXDir);

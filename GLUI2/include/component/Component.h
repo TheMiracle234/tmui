@@ -24,17 +24,17 @@ namespace TM {
 		int count;
 	};
 
+	inline constexpr int DEFAULT_WIDTH = 0;
+	inline constexpr int DEFAULT_HEIGHT = 0;
 
 	class Component
 	{	
 	TM_private:
-		using FlagType = uint8_t;
-		enum : FlagType {
-			NONE = 0x00,
-			IS_DESTROYING = 0x01,
-			ACTIVE = 0x02,
+		enum{
+			IS_DESTROYING,
+			ACTIVE,
 		};
-		FlagType flags = ACTIVE;
+		Flag8 flags;
 		std::vector<std::unique_ptr<Component>> children;
 		std::vector<int> deletedChildrenIndices;
 	
@@ -70,9 +70,9 @@ namespace TM {
 		const IndicesPos& getIndicesPos()					{ return indicesPos; }
 		const std::shared_ptr<Shader>& getShader()			{ return shader; }
 		void render()		{ window->draw(this); }
-		bool isActive()		{ return flags & ACTIVE; }
-		void activate()		{ flags |= ACTIVE; }
-		void deactivate()	{ flags &= ~ACTIVE; }
+		bool isActive()		{ return flags[ACTIVE]; }
+		void activate()		{ flags.set(ACTIVE); }
+		void deactivate()	{ flags.remove(ACTIVE); }
 		// default 0. this should between -128~127, cus if its too big, there must be something wrong with your design
 		void setPriority(int8_t prio)	{ priority = prio; window->setCompOrderChanged(); }
 		// pos in window
@@ -98,6 +98,8 @@ namespace TM {
 		virtual std::optional<glm::vec4> getTextColor()		{ return std::nullopt; }
 		virtual int getFontWidth()		{ return 0; }
 		virtual int getFontHeight()		{ return 0; }
+		// for image(texture)
+		virtual int getTexture() const	{ return 0; }
 		//all the update is done after shader->bind() and before shader->draw()
 		virtual void update() = 0;
 	};

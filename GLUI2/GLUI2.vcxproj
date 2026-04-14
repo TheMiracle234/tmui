@@ -35,6 +35,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\component\Image.h" />
     <ClInclude Include="include\component\LoadingBar.h" />
     <ClInclude Include="include\component\Container.h" />
     <ClInclude Include="include\component\Button.h" />
@@ -53,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\example1.cpp" />
+    <ClCompile Include="src\imp\Image.cpp" />
     <ClCompile Include="src\imp\LoadingBar.cpp" />
     <ClCompile Include="src\imp\Container.cpp" />
     <ClCompile Include="src\imp\Button.cpp" />
@@ -63,6 +65,7 @@
     <ClCompile Include="src\imp\debug.cpp" />
     <ClCompile Include="src\imp\Rectangle.cpp" />
     <ClCompile Include="src\imp\Shader.cpp" />
+    <ClCompile Include="src\imp\stb_image.cpp" />
     <ClCompile Include="src\imp\Triangle.cpp" />
     <ClCompile Include="src\imp\Window.cpp" />
     <ClCompile Include="src\imp\Text.cpp" />

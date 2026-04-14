@@ -4,6 +4,7 @@
 #include "render/Buffer.h"
 #include "render/Shader.h"
 #include "component/Event.h"
+#include "component/Image.h"
 
 #include <queue>
 #include <iostream>
@@ -46,8 +47,15 @@ namespace TM {
 		window.reset(glfwCreateWindow(w, h, title.data(), nullptr, nullptr));
 		TM_assertOr(window, "GLFW window creation error");
 
-		// glewinit
+		/*
+		* ================================================
+		* 
+		*  all the init only once settings
+		* 
+		* ================================================
+		*/
 		if (countWindows == 0) {
+			// glewinit
 			glfwMakeContextCurrent(window.get());
 			TM_assertOr(glewInit() == GLEW_OK, "GLEW init error");
 			TM_println("glewInit");
@@ -57,8 +65,9 @@ namespace TM {
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // for font render
 
-			//shader related init
+			// some class static init
 			Shader::staticInit();
+			Image::staticInit();
 		}
 		
 		// other gl init related to window obj
@@ -97,9 +106,9 @@ namespace TM {
 	}
 
 	void Window::clear() {
-		if (!(flags & IS_LOOPING)) {
+		if (!(flags[IS_LOOPING])) {
 			thingsBeforeDrawLoop();
-			flags |= IS_LOOPING;
+			flags.set(IS_LOOPING);
 		}
 		setViewport(0, 0, width, height);
 		_clearWithOutCompClear();
@@ -176,12 +185,12 @@ namespace TM {
 		deltaTime = std::chrono::duration<float>(now - m_lastTimePoint).count();
 		m_lastTimePoint = now;
 
-		if (flags & COMP_ORDER_CHANGED) {
+		if (flags[COMP_ORDER_CHANGED]) {
 			std::stable_sort(components.begin(), components.end(),
 				[](Component* c1, Component* c2) {
 					return c1->priority > c2->priority;
 				});
-			flags &= ~COMP_ORDER_CHANGED;
+			flags.remove(COMP_ORDER_CHANGED);
 		}
 	}
 

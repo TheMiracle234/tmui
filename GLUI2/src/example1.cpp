@@ -4,6 +4,7 @@
 #include "component/Button.h"
 #include "component/Container.h"
 #include "component/Triangle.h"
+#include "component/Image.h"
 
 #include <string>
 #include <memory>
@@ -65,6 +66,8 @@ int main() {
         vec2(0, 300), vec2(400, 100), vec2(800, 200),
         window, 0xFF00FF77
     );
+
+    auto img1 = std::make_unique<TM::Image>(window, 400, 20, (char*)u8"images/David.jpg", 200);
 
     std::vector<TM::Component*> btns;
     tri1->setPriority(1);

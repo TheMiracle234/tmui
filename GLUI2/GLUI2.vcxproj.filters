@@ -60,6 +60,9 @@
     <ClInclude Include="include\component\LoadingBar.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\component\Image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\imp\Buffer.cpp">
@@ -99,6 +102,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\imp\LoadingBar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imp\stb_image.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imp\Image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\example1.cpp">

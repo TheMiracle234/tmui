@@ -9,8 +9,6 @@
 
 namespace TM{
 
-	inline constexpr int DEFAULT_WIDTH = 0;
-
 	enum class BtnState : uint8_t {
 		ON,
 		DOWN,

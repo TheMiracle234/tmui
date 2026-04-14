@@ -82,7 +82,6 @@ namespace TM {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 
-
 	}
 
 	Shader::Shader(const Data& _data, std::string_view vertexCode, std::string_view fragmentCode, unsigned int _glDrawtype):
@@ -150,6 +149,7 @@ namespace TM {
 			loadData();
 			dataLoaded = true;
 		}
+		glBindTexture(GL_TEXTURE_2D, comp->getTexture());
 		glDrawElements(comp->getGlDrawMode(), indicesPos.count, GL_UNSIGNED_INT, reinterpret_cast<void*>(indicesPos.offset * sizeof(unsigned int)));
 
 		auto txt = comp->getText();

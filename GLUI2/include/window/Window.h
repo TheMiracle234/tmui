@@ -54,14 +54,11 @@ namespace TM {
 	{
 		friend class Component;
 	TM_private:
-		using FlagType = uint8_t;
-		enum : FlagType{
-			NONE =					0,
-			IS_LOOPING =			0x01,
-			COMP_ORDER_CHANGED =	0x02,
+		enum {
+			COMP_ORDER_CHANGED,
+			IS_LOOPING,
 		};
-
-		FlagType flags = NONE; // universal flags
+		Flag8 flags; // universal flags
 		int minWidth = 200;
 		int minHeight = 200;
 		int maxWidth = NO_LIMIT;
@@ -87,7 +84,7 @@ namespace TM {
 		//void _drawWithoutCompClear(Component * const component);
 		void pushComp(Component* const comp);
 		void thingsBeforeDrawLoop();
-		void setCompOrderChanged() { flags |= COMP_ORDER_CHANGED; }
+		void setCompOrderChanged() { flags.set(COMP_ORDER_CHANGED); }
 		void clear();
 		// before swapBuffers, all the comps borrowed will be drawn
 		template<bool renderInside = true>
@@ -108,7 +105,7 @@ namespace TM {
 
 		auto& get() { return window; }
 		void draw(Component* const component);
-		void bind()					{ glfwMakeContextCurrent(window.get()); components.clear(); flags &= ~IS_LOOPING; }
+		void bind()					{ glfwMakeContextCurrent(window.get()); components.clear(); flags.remove(IS_LOOPING); }
 		void close()				{ glfwSetWindowShouldClose(window.get(), true); }
 		template<bool renderInside = true>
 		bool closed()				{ swapBuffers<renderInside>(); clear(); return glfwWindowShouldClose(window.get()); }

@@ -21,9 +21,9 @@ namespace TM {
 			uint32_t RGBA = 0x4477FFFF, std::unique_ptr<Component> _child = nullptr, const std::shared_ptr<Shader>& _shader = nullptr, bool loadData = true
 		);
 		virtual ~Rectangle();
-
 		void setWidth(int w)	{ width = static_cast<float>(w); }
 		void setHeight(int h)	{ height = static_cast<float>(h); }
+
 
 	// static 
 	TM_public:

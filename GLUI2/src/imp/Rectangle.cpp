@@ -90,7 +90,7 @@ namespace TM {
 	{
 		shader->setUniform("uColor", &rectColor);
 		auto vp = getViewport();
-		glm::mat4 projection = glm::ortho(0.0f, (float)vp.w, (float)vp.h, 0.0f, -1.0f, 1.0f);
+		glm::mat4 projection = glm::ortho(0.0f, (float)vp.w, (float)vp.h, 0.0f);
 		shader->setUniform("projection", &projection);
 	}
 
